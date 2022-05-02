@@ -2,7 +2,7 @@
 pvp2048(name is temporary) is a 1vs1 turn based multiplayer game based on 2048.
 
 ## Gameplay
-Game is basiclly 2048 but one player did the swipe second player gets a swipe.
+Game is basiclly 2048 but when one player did the swipe second player gets a turn.
 Each player has his own score and player get points for merge only on their turn.
 Player who has most points when a game ends wins.
 Control the game by pressing arrow keys and maybe add some mouse only option like dragging or buttons.
