@@ -12,7 +12,7 @@ Both ability to play in guest mode and very basic registration.
 There should be ability to play with friends and that means game invites(but friend list is probably overkill)  
 Game should have matchmaking based on players elo.  
 chat with opponent(maybe dms?)  
-Maybe add some divisions on top of elo in ranked to create goal to reach for players.  
+Maybe add some divisions on top of elo in ranked to create goal for players to reach.  
 
 ## Some questions
 Not sure why i made this section but i did.  
