@@ -14,7 +14,15 @@ Game should have matchmaking based on players elo.
 chat with opponent(maybe dms?)  
 Maybe add some divisions on top of elo in ranked to create goal for players to reach.  
 
+
+
 ## Some questions
 Not sure why i made this section but i did.  
 - Does player who does first turn have advantage?  
 - Should game spwan tiles completly random or have some sort of pattern?(its could be useful to discourage some behaivor or to make game more skill-based or to implemet comeback mechanic)  
+
+## Technical stuff
+- We early find a way to manage dependencies early. Dependency management is always big pain in the ass in C++.
+- CorocachDB for Db.
+- Docker
+- Should we use wasm for frontened or just plain js/ts?
