@@ -30,9 +30,11 @@ In terms of social we should aim for basic 1v1 first and build on top of this. I
 ## Technical stuff
 - We should find a way to manage dependencies early. Dependency management is always big pain in the ass in C++.
   - Any good recommendations?
+    - Conan looks fine. Or we can download from pacman/apt. Or we could just copy-paste it in build tree.
 - CorocachDB for Db.
 - Docker
   - For local environment we will only use docker to run services - databases, etc.
   - Do we want to run application dockerized in production?
+    - Im not sure.
 - Should we use wasm for frontened or just plain js/ts?
   - I don't want to go wasm route since it's additional stack element that we are not familiar with. We can reconsider this later. gRPC+gRPC-web should be pretty safe bet for the start
