@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/pvp2048.dir/src/gamelogic.cc.o -o bin/pvp2048   -L/home/clownpi3c3/.conan/data/gtest/1.8.1/_/_/package/473fac5a451159bef91e2252b31a075ead43201f/lib  -Wl,-rpath,/home/clownpi3c3/.conan/data/gtest/1.8.1/_/_/package/473fac5a451159bef91e2252b31a075ead43201f/lib -lgtest_main -lgmock_main -lgmock -lgtest -lpthread 
