@@ -3,3 +3,4 @@
 *.log
 tmp/
 cpp/build/*
+cpp/.ccls-cache
