@@ -11,6 +11,5 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
 
-
 add_executable(pvp2048 src/gamelogic.cc)
 target_link_libraries(pvp2048 ${CONAN_LIBS})
