@@ -24,7 +24,7 @@ struct Point {
     return *this;
   }
   friend Point operator+(const Point& p1, const Point& p2) {
-    return Point(p1.x+p2.x, p2.y+p2.y);
+    return Point(p1.x+p2.x, p1.y+p2.y);
   }
   friend bool operator==(const Point& p1, const Point& p2) {
     return p1.x == p2.x &&
@@ -104,7 +104,7 @@ void add_tile(GameField &f) {
 bool move_tile(GameField& f, Point from, GameAction action) {
   if(f[from]==0)
     return false;
-  Point change = direction(action);
+  const Point change = direction(action);
   Point new_position = from;
   Point test_position = from;
   while(is_tile_free(f, test_position+=change)) {
@@ -118,14 +118,14 @@ bool move_tile(GameField& f, Point from, GameAction action) {
       f[from] = 0;
     }
 
-  // bool will_merge = is_tile_on_board(f, new_position+change) &&
-  //   f[new_position+change] == f[new_position];
+  bool will_merge = is_tile_on_board(f, new_position+change) &&
+    f[new_position+change] == f[new_position];
 
-  // if(will_merge) {
-  //   f[new_position+change]++;
-  //   f[new_position] = 0;
-  //   return true;
-  // }
+  if(will_merge) {
+    f[new_position+change]++;
+    f[new_position] = 0;
+    return true;
+  }
   return is_moved;
 }
 
@@ -162,7 +162,7 @@ bool move_tiles(GameField& f, GameAction direction) {
     }
     break;
   }
-  return true;
+  return is_state_changed;
 }
 
 struct Game::impl {
