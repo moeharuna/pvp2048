@@ -5,3 +5,4 @@ tmp/
 cpp/build/*
 cpp/.ccls-cache
 cpp/src/include/*
+cpp/.cache

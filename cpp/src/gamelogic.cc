@@ -1,5 +1,6 @@
 #include "gamelogic.h"
 #include <cstdlib>
+#include <string>
 #include <vector>
 #include <array>
 #include <cmath>
@@ -12,7 +13,38 @@ struct Point {
   int32_t y;
   int32_t x;
   Point(size_t x, size_t y);
+  Point &operator+=(const Point& p2) {
+    this->x+=p2.x;
+    this->y+=p2.y;
+    return *this;
+  }
+  Point &operator-=(const Point& p2) {
+    this->x-=p2.x;
+    this->y-=p2.y;
+    return *this;
+  }
+  friend Point operator+(const Point& p1, const Point& p2) {
+    return Point(p1.x+p2.x, p2.y+p2.y);
+  }
+  friend bool operator==(const Point& p1, const Point& p2) {
+    return p1.x == p2.x &&
+           p1.y == p2.y;
+  }
 };
+
+Point direction(GameAction a) {
+  switch(a) {
+  case MOVE_UP:
+    return Point(0, -1);
+  case MOVE_DOWN:
+    return Point(0, 1);
+  case MOVE_LEFT:
+    return Point(-1, 0);
+  case MOVE_RIGHT:
+    return Point(1, 0);
+  }
+  assert(1!=1);
+}
 
 struct GameField {
   uint32_t value_[BOARD_SIZE]= {0}; //values are power of 2
@@ -44,7 +76,7 @@ uint64_t GameField::operator()(const Point p) {
     return pow(2, value_[p.y*BOARD_WIDTH + p.x]);
 }
 
-bool is_tile_on_field(const GameField& f, Point where) {
+bool is_tile_on_board(const GameField& f, Point where) {
     return
         where.y < BOARD_WIDTH &&
         where.x < BOARD_WIDTH &&
@@ -54,7 +86,7 @@ bool is_tile_on_field(const GameField& f, Point where) {
 
 bool is_tile_free(const GameField& f, Point where) {
     return
-        is_tile_on_field(f,where) &&
+        is_tile_on_board(f,where) &&
         f[where]==0;
 }
 
@@ -69,72 +101,68 @@ void add_tile(GameField &f) {
     f.value_[new_tile_pos] = 1;
 }
 
-bool move_tile(GameField& f, Point from, GameAction direction) {
-    auto change = Point(0, 0);
-    switch(direction) {
-        case MOVE_UP:
-            change.y = -1;
-            break;
-        case MOVE_DOWN:
-            change.y = 1;
-            break;
-        case MOVE_LEFT:
-            change.x = -1;
-            break;
-        case MOVE_RIGHT:
-            change.x  = 1;
-            break;
-    }
-    auto most_further_point = from;
-    while(is_tile_free(f, most_further_point)) {
-        most_further_point.x+=change.x;
-        most_further_point.y+=change.y;
-    }
-    auto is_moved = most_further_point.x != from.x || most_further_point.y != from.y;
-    if(is_moved) {
-        most_further_point.x-=change.x;
-        most_further_point.y-=change.y;
+bool move_tile(GameField& f, Point from, GameAction action) {
+  if(f[from]==0)
+    return false;
+  Point change = direction(action);
+  Point new_position = from;
+  Point test_position = from;
+  while(is_tile_free(f, test_position+=change)) {
+    new_position = test_position;
+  }
 
-        f[most_further_point] = f[from];
-        f[from] = 0;
+  bool is_moved = !(new_position==from); //!= not implemnted
+  if(is_moved)
+    {
+      f[new_position] = f[from];
+      f[from] = 0;
     }
-    return is_moved;
-}
 
-bool merge_tile(GameField& f, Point from, GameAction direction) {
-    auto tile_to_merge_with = Point(BOARD_WIDTH, BOARD_WIDTH); //Should be invalid by default
-    switch(direction) {
-        case MOVE_UP:
-            tile_to_merge_with = Point(from.x, from.y-1);
-            break;
-        case MOVE_DOWN:
-            tile_to_merge_with = Point(from.x, from.y+1);
-            break;
-        case MOVE_LEFT:
-            tile_to_merge_with = Point(from.x-1, from.y);
-            break;
-        case MOVE_RIGHT:
-            tile_to_merge_with = Point(from.x+1, from.y);
-            break;
-    }
-    auto will_merge = is_tile_on_field(f, tile_to_merge_with) && f[from]==f[tile_to_merge_with];
-    if(will_merge) {
-        f[tile_to_merge_with]++;
-        f[from]=  0;
-    }
-    return will_merge;
+  // bool will_merge = is_tile_on_board(f, new_position+change) &&
+  //   f[new_position+change] == f[new_position];
+
+  // if(will_merge) {
+  //   f[new_position+change]++;
+  //   f[new_position] = 0;
+  //   return true;
+  // }
+  return is_moved;
 }
 
 
-bool move_and_merge_tiles(GameField& f, GameAction direction) {
-    bool is_state_changed = false;
+bool move_tiles(GameField& f, GameAction direction) {
+  bool is_state_changed = false;
+  switch(direction) {
+  case MOVE_UP:
     for(int y=0; y<BOARD_WIDTH; ++y) {
-        for(int x=0; x<BOARD_WIDTH; ++x) {
-            is_state_changed = is_state_changed || move_tile(f, Point(x, y), direction);
-            is_state_changed = is_state_changed || merge_tile(f, Point(x, y), direction);
-        }
+      for(int x=0; x<BOARD_WIDTH; ++x) {
+         is_state_changed |= move_tile(f, Point(x, y), direction);
+      }
     }
-    return is_state_changed;
+    break;
+  case MOVE_DOWN:
+    for(int y=BOARD_WIDTH-1; y>=0; --y) {
+      for(int x=0; x<BOARD_WIDTH; ++x) {
+         is_state_changed |= move_tile(f, Point(x, y), direction);
+      }
+    }
+    break;
+  case MOVE_LEFT:
+    for(int y=0; y<BOARD_WIDTH; ++y) {
+      for(int x=0; x<BOARD_WIDTH; ++x) {
+        is_state_changed |= move_tile(f, Point(x, y), direction);
+      }
+    }
+    break;
+  case MOVE_RIGHT:
+    for(int y=0; y<BOARD_WIDTH; ++y) {
+      for(int x=BOARD_WIDTH-1; x>=0; --x) {
+        is_state_changed |= move_tile(f, Point(x, y), direction);
+      }
+    }
+    break;
+  }
+  return true;
 }
 
 struct Game::impl {
@@ -143,7 +171,7 @@ struct Game::impl {
   size_t player_to_make_turn_;
   bool player_turn() {
     auto action = this->players_[player_to_make_turn_]->get_action();
-    return move_and_merge_tiles(this->tiles_, action);
+    return move_tiles(this->tiles_, action);
     //TODO: Increse player score
   }
 };
@@ -152,7 +180,7 @@ struct Game::impl {
 
 std::string Game::printable_game_board() const {
   std::string board{};
-  board+=std::string(BOARD_WIDTH+1, '_');
+//  board+=std::string(BOARD_WIDTH*2+1, '_');
   board+="\n";
   for(int y=0; y<BOARD_WIDTH; ++y) {
     board+="|";
@@ -162,24 +190,29 @@ std::string Game::printable_game_board() const {
         board+=" ";
       else
         board+=std::to_string(value);
+      board+="|";
     }
-    board+="|\n";
+
+    board+=" "+ std::to_string(y)+ " \n";
   }
-  board+=std::string(BOARD_WIDTH+1, '_');
+//  board+=std::string(BOARD_WIDTH*2+1, '-');
   board+="\n\n\n";
   return board;
 }
 
 
 Winner Game::game_loop() {
+  add_tile(pImpl->tiles_);
     for (;;) {
-        add_tile(pImpl->tiles_);
-        while(!pImpl->player_turn());
-        for(const auto &p: pImpl->players_) {
-            p->update_game_state(*this);
-            p->update_game_state(*this);
-        }
-        pImpl->player_to_make_turn_ = ++pImpl->player_to_make_turn_ % 2;
+      for(const auto &p: pImpl->players_) {
+        p->update_game_state(*this);
+      }
+      while(!pImpl->player_turn());
+      for(const auto &p: pImpl->players_) {
+        p->update_game_state(*this);
+      }
+      add_tile(pImpl->tiles_);
+      pImpl->player_to_make_turn_ = ++pImpl->player_to_make_turn_ % 2;
     }
 }
 
