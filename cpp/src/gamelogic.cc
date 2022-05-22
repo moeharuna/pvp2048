@@ -9,7 +9,9 @@
 //#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 //#include "include/doctest/doctest.h"
 
+
 struct Point {
+  public:
   int32_t y;
   int32_t x;
   Point(size_t x, size_t y);
@@ -47,6 +49,7 @@ Point direction(GameAction a) {
 }
 
 struct GameField {
+  public:
   uint32_t value_[BOARD_SIZE]= {0}; //values are power of 2
 
   uint64_t operator()(Point p); //Returns  display value e.g. with value_[y][x] = 5 this function will return 512
@@ -174,43 +177,61 @@ struct Game::impl {
     return move_tiles(this->tiles_, action);
     //TODO: Increse player score
   }
+  GameState new_game_state(size_t perspective) { //FIXME: This should take reference to player not his array number
+    GameState gs{};
+    gs.your_turn_now = player_to_make_turn_==perspective;
+    gs.your_score = 0; //TODO: score
+    gs.enemy_score = 0;
+    for(size_t y=0; y<BOARD_WIDTH; ++y) {
+      for(size_t x=0; x<BOARD_WIDTH; ++x) {
+        gs.gameField[y][x] = tiles_(Point(x, y));
+      }
+    }
+    return gs;
+  }
+  void update_players_state() {
+    for(size_t i=0; i< NUMBER_OF_PLAYERS; ++i) {
+      players_[i]->read_game_state(new_game_state(i));
+    }
+  }
 };
 
 
 
-std::string Game::printable_game_board() const {
+std::string GameState::to_string() const {
   std::string board{};
-//  board+=std::string(BOARD_WIDTH*2+1, '_');
   board+="\n";
-  for(int y=0; y<BOARD_WIDTH; ++y) {
+  for(int y=0; y<gameField.size(); ++y) {
     board+="|";
-    for(int x=0; x<BOARD_WIDTH; ++x) {
-      auto value = pImpl->tiles_(Point(x, y));
+    for(int x=0; x<gameField[0].size(); ++x) {
+      auto value = gameField[y][x];
       if(value==0)
         board+=" ";
       else
         board+=std::to_string(value);
       board+="|";
     }
-
     board+=" "+ std::to_string(y)+ " \n";
   }
-//  board+=std::string(BOARD_WIDTH*2+1, '-');
   board+="\n\n\n";
   return board;
 }
 
 
-Winner Game::game_loop() {
+void Game::game_loop() {
   add_tile(pImpl->tiles_);
     for (;;) {
-      for(const auto &p: pImpl->players_) {
-        p->update_game_state(*this);
-      }
+
+      /*
+        I need to update twice: once after action and once after
+        random tile is added.
+        Technicly client know state after action so in future
+        this could be fixed
+      */
+      pImpl->update_players_state();
       while(!pImpl->player_turn());
-      for(const auto &p: pImpl->players_) {
-        p->update_game_state(*this);
-      }
+      pImpl->update_players_state();
+
       add_tile(pImpl->tiles_);
       pImpl->player_to_make_turn_ = ++pImpl->player_to_make_turn_ % 2;
     }
@@ -228,7 +249,7 @@ Game::~Game() = default;
 
 class TestPlayer : public Player {
 public:
-  TestPlayer(): score(0) {
+  TestPlayer() {
   }
   ~TestPlayer() override {}
   GameAction get_action() override {
@@ -251,18 +272,13 @@ public:
       return MOVE_UP;
     }
   }
-  score_t& player_score() override{
-    return score;
+ void read_game_state(const GameState& gs)  override{
+    std::cout<<gs.to_string();
   }
- void update_game_state(const Game& g)  override{
-    std::cout<<g.printable_game_board();
-  }
-private:
-  score_t score;
 };
 
 class TestPlayer2 : public TestPlayer {
-  void update_game_state(const Game& g)  override{
+  void read_game_state(const GameState& _gs)  override{
 
   }
 };
