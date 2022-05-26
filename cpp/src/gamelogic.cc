@@ -283,13 +283,6 @@ class TestPlayer2 : public TestPlayer {
   }
 };
 
-
-
-// TEST_CASE("Game testing") {
-//   //FIXME: Threre should be unit tests
-
-// }
-#endif //ENABLE_TESTS
 int main(int argc, char ** argv) {
   player_ptr p1 = std::make_unique<TestPlayer>();
   player_ptr p2 = std::make_unique<TestPlayer2>();
@@ -297,3 +290,9 @@ int main(int argc, char ** argv) {
   Game g{std::move(p1), std::move(p2)};
   g.game_loop();
 }
+
+// TEST_CASE("Game testing") {
+//   //FIXME: Threre should be unit tests
+
+// }
+#endif //ENABLE_TESTS
