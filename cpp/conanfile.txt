@@ -1,0 +1,6 @@
+[requires]
+doctest/2.4.8
+[generators]
+cmake
+[imports]
+include, *.h -> ../src/include @ folder=False
