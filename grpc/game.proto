@@ -3,31 +3,38 @@ service Game {
     //FIXME: Instead of streaming whole state server should
     //stream enemy actions and new tiles position. Whole state should be
     //returned only on reconnects
-	rpc startGame  (Nothing)    returns (stream GameState) {}
-	rpc makeAction (GameAction) returns (ActionResult) {}
+    //TODO: Lobby
+ 	rpc gameSession  (stream GameSessionRequest)    returns (stream GameSessionResponse) {}
 }
 
-message Nothing {}
+enum GameAction {
+    ACTION_LEFT_MOVE = 0;
+    ACTION_RIGHT_MOVE = 1;
+    ACTION_UP_MOVE = 2;
+    ACTION_DOWN_MOVE = 3;
+}
 
 message GameState {
-	repeated int32 tile = 1; //Power of 2
+    repeated int32 tile = 1; //Power of 2
 	bool your_turn_now = 2;
     uint64 your_score = 3;
     uint64 enemy_score = 4;
 }
 
-message GameAction {
-    enum Action {
-	     LEFT_MOVE = 0;
-	     RIGHT_MOVE = 1;
-	     UP_MOVE = 2;
-	     DOWN_MOVE = 3;
-	}
+enum ActionStatus {
+    STATUS_OK = 0;
+    STATUS_INVALID_ACTION =1;
 }
 
 message ActionResult {
-    enum Result {
-         OK = 0;
-         INVALID_ACTION =1;
-    }
+    ActionStatus status = 1;
+    GameState resultState = 2;
+}
+
+oneof GameSessionResponse {
+    ActionResult result = 1;
+}
+
+oneof GameSessionRequest {
+    GameAction action = 1;
 }
