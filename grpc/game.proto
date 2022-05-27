@@ -16,9 +16,10 @@ enum GameAction {
 
 message GameState {
     repeated int32 tile = 1; //Power of 2
-	bool your_turn_now = 2;
-    uint64 your_score = 3;
-    uint64 enemy_score = 4;
+    int32 field_width = 2;
+    bool your_turn_now = 3;
+    uint64 your_score = 4;
+    uint64 enemy_score = 5;
 }
 
 enum ActionStatus {
