@@ -30,11 +30,14 @@ message ActionResult {
     ActionStatus status = 1;
     GameState resultState = 2;
 }
-
-oneof GameSessionResponse {
-    ActionResult result = 1;
+message GameSessionResponse {
+    oneof response {
+          ActionResult result = 1;
+    }
 }
 
-oneof GameSessionRequest {
-    GameAction action = 1;
+message GameSessionRequest {
+    oneof request {
+          GameAction action = 1;
+    }
 }
