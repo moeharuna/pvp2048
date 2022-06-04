@@ -1,44 +1,82 @@
 syntax = "proto3";
-service Game {
+service grpc_Game {
     //FIXME: Instead of streaming whole state server should
     //stream enemy actions and new tiles position. Whole state should be
     //returned only on reconnects
     //TODO: Lobby
- 	rpc gameSession  (stream GameSessionRequest)    returns (stream GameSessionResponse) {}
+ 	rpc startGameSession  (stream grpc_ClientMessage)    returns (stream grpc_ServerMessage) {}
 }
 
-enum GameAction {
+enum grpc_GameAction {
     ACTION_LEFT_MOVE = 0;
     ACTION_RIGHT_MOVE = 1;
     ACTION_UP_MOVE = 2;
     ACTION_DOWN_MOVE = 3;
 }
 
-message GameState {
+message grpc_GameState {
     repeated int32 tile = 1; //Power of 2
-    int32 field_width = 2;
-    bool your_turn_now = 3;
-    uint64 your_score = 4;
-    uint64 enemy_score = 5;
+    uint64 your_score = 2;
+    uint64 enemy_score = 3;
+    int32 field_width = 4;
 }
 
-enum ActionStatus {
+enum grpc_ActionStatus {
     STATUS_OK = 0;
     STATUS_INVALID_ACTION =1;
 }
 
-message ActionResult {
-    ActionStatus status = 1;
-    GameState resultState = 2;
+message grpc_ActionResult {
+    grpc_ActionStatus status = 1;
+    grpc_GameState resultState = 2;
 }
-message GameSessionResponse {
+
+message grpc_UpdateGameState {
+    grpc_GameState newState = 1;
+}
+
+message grpc_AskForInput {
+
+}
+
+message grpc_ClientRequest {
+
+}
+
+message grpc_ClientResponse {
     oneof response {
-          ActionResult result = 1;
+        grpc_GameAction action =1;
     }
 }
 
-message GameSessionRequest {
+message grpc_ClientMessage {
+    oneof kind {
+        grpc_ClientRequest   request =  1;
+        grpc_ClientResponse  response= 2;
+    }
+}
+
+
+message grpc_ServerResponse {
+    oneof response {
+        grpc_ActionResult result = 1;
+    }
+}
+
+
+message grpc_ServerRequest {
     oneof request {
-          GameAction action = 1;
+        grpc_UpdateGameState update =1;
+        grpc_AskForInput ask = 2;
+    }
+}
+
+
+
+message grpc_ServerMessage {
+    oneof kind {
+          grpc_ServerRequest  request = 1;
+          grpc_ServerResponse response = 2;
+
     }
 }
