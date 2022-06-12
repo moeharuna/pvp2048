@@ -33,10 +33,10 @@ struct GameState {
   std::string to_string() const;
 
   std::array<std::array<uint32_t, BOARD_WIDTH>, BOARD_WIDTH> gameField; // power of two
-  bool your_turn_now;
-  score_t your_score;
-  score_t enemy_score;
-};
+  bool your_turn_now = false;
+  score_t your_score = 0;
+  score_t enemy_score = 0;
+} emptyState;
 
 using player_ptr = std::unique_ptr<Player>;
 class Game {

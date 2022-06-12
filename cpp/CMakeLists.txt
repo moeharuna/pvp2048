@@ -16,6 +16,7 @@ set(GRPC_OUT
 add_library(grpc ${GRPC_OUT})
 set(SERVER_FILES
   src/gamelogic.cc
+  src/network_player.cc
   )
 
 add_executable(pvp2048 ${SERVER_FILES})
