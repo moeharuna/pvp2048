@@ -10,6 +10,15 @@ add_definitions("-std=c++17")
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
+set(GRPC_OUT
+  src/proto_out/game.grpc.pb.cc
+  )
+add_library(grpc ${GRPC_OUT})
+set(SERVER_FILES
+  src/gamelogic.cc
+  src/network_player.cc
+  )
 
-add_executable(pvp2048 src/gamelogic.cc)
+add_executable(pvp2048 ${SERVER_FILES})
 target_link_libraries(pvp2048 ${CONAN_LIBS})
+target_link_libraries(pvp2048 ${grpc})
