@@ -11,67 +11,6 @@
 enum grpcNoDataType {
   askForInput
 };
-// class ChannelReader {
-
-// public:
-
-//   ChannelReader(std::shared_ptr<channel_t> channel): grpc_chan(channel) {
-//   }
-
-//   grpc_ClientRequest wait_for_request() {
-//     if(request_queue.empty()) {
-//       read_msg();
-//       return wait_for_request();
-//     } else {
-//       auto last = *(request_queue.end()--);
-//       request_queue.pop_back();
-//       return last;
-//     }
-//   }
-
-//   grpc_ClientResponse wait_for_response(const std::vector<grpc_ClientResponse::ResponseCase>& awaited_events) {
-
-//     const auto is_awaited = [awaited_events](const grpc_ClientResponse& response ) {
-//       return std::any_of(awaited_events.begin(), awaited_events.end(),
-//                          [response](const auto& c) {
-//                            response.response_case()==c;
-//                          });
-//     };
-
-//     auto response = std::find_if(response_queue.begin(), response_queue.end(), is_awaited);
-//     if(response==response_queue.end()) {
-//       read_msg();
-//       return wait_for_response(awaited_events);
-//     }
-//     else {
-//       auto result = *response;
-//       response_queue.erase(response);
-//       return result;
-//     }
-
-//   }
-// private:
-
-//   void read_msg() {
-//     grpc_ClientMessage result;
-//     grpc_chan->Read(&result);
-
-//     if(result.has_request()) {
-//       request_queue.push_back(result.request());
-//     }
-//     else if(result.has_response()) {
-//       response_queue.push_back(result.response());
-//     }
-//     else {
-//       assert(false);
-//     }
-//   }
-// private:
-//   std::vector<grpc_ClientRequest> request_queue;
-//   std::vector<grpc_ClientResponse> response_queue;
-//   std::shared_ptr<channel_t> grpc_chan;
-// };
-
 
 
 
