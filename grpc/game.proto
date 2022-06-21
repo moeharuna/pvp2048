@@ -35,17 +35,17 @@ message grpc_UpdateGameState {
     grpc_GameState newState = 1;
 }
 
-message grpc_AskForInput {
 
-}
+message grpc_EmptyResponse {}
 
-message grpc_ClientRequest {
+message grpc_AskForInput {}
 
-}
+message grpc_ClientRequest {}
 
 message grpc_ClientResponse {
     oneof response {
-        grpc_GameAction action =1;
+        grpc_EmptyResponse empty = 1;
+        grpc_GameAction action = 2;
     }
 }
 
@@ -59,7 +59,9 @@ message grpc_ClientMessage {
 
 message grpc_ServerResponse {
     oneof response {
-        grpc_ActionResult result = 1;
+        grpc_EmptyResponse empty = 1;
+        grpc_ActionResult result = 2;
+
     }
 }
 

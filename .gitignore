@@ -7,3 +7,4 @@ cpp/.ccls-cache
 cpp/src/include/*
 cpp/src/proto_out/*
 cpp/.cache
+.ccls-cache
